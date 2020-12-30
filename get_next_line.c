@@ -6,7 +6,7 @@
 /*   By: obelair <obelair@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/29 15:34:28 by obelair           #+#    #+#             */
-/*   Updated: 2020/12/30 18:30:15 by obelair          ###   ########lyon.fr   */
+/*   Updated: 2020/12/30 19:13:04 by obelair          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,18 +44,17 @@ char	*get_keep_save(char *save)
 	return (keep);
 }
 
-int		get_next_line(int fd, char **line)
+int        get_next_line(int fd, char **line)
 {
 	char		*buff;
 	static char	*save;
 	int			rd;
 
-	if (fd < 0 || !line || BUFFER_SIZE < 1)
-		return (-1);
-	if (!(buff = malloc(sizeof(char) * (BUFFER_SIZE + 1))))
+	if ((fd < 0 || !line || BUFFER_SIZE < 1)
+	|| !(buff = malloc(sizeof(char) * (BUFFER_SIZE + 1))))
 		return (-1);
 	rd = 1;
-	while (ft_strchr(save, '\n') == -1 && rd)
+	while ((ft_strchr(save, '\n') == -1) && rd)
 	{
 		if ((rd = read(fd, buff, BUFFER_SIZE)) == -1)
 		{
@@ -63,12 +62,13 @@ int		get_next_line(int fd, char **line)
 			return (-1);
 		}
 		buff[rd] = '\0';
-		save = ft_strjoin(save, buff);
+		if (!(save = ft_strjoin(save, buff)))
+			return (-1);
 	}
 	free(buff);
-	*line = get_line(save);
-	save = get_keep_save(save);
-	if (!rd)
-		return (0);
+	if (!(*line = get_line(save)))
+		return -1;
+	if (!(save = get_keep_save(save)) || !rd)
+		return 0;
 	return (1);
 }
