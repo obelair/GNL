@@ -6,29 +6,24 @@
 /*   By: obelair <obelair@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/29 15:34:28 by obelair           #+#    #+#             */
-/*   Updated: 2020/12/29 21:03:28 by obelair          ###   ########lyon.fr   */
+/*   Updated: 2020/12/30 18:30:15 by obelair          ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int		get_line(char *line, char *str)
+char	*get_line(char *str)
 {
-	int i;
+	int		i;
+	char	*tmp;
 
 	if (!str)
-		return (0);
-	i = ft_strchr(str, '\n');
-	if (i == -1 || !(line = malloc(sizeof(char) * (ft_strlen(str) - i + 1))))
-		return (0);
-	i = 0;
-	while (str[i] && str[i] != '\n')
-	{
-		line[i] = str[i];
-		i++;
-	}
-	line[i] = '\0';
-	return (1);
+		return (NULL);
+	if ((i = ft_strchr(str, '\n')) == -1)
+		tmp = ft_substr(str, 0, ft_strlen(str));
+	else
+		tmp = ft_substr(str, 0, i);
+	return (tmp);
 }
 
 char	*get_keep_save(char *save)
@@ -60,7 +55,7 @@ int		get_next_line(int fd, char **line)
 	if (!(buff = malloc(sizeof(char) * (BUFFER_SIZE + 1))))
 		return (-1);
 	rd = 1;
-	while (ft_strchr(save, '\n') != -1 && rd)
+	while (ft_strchr(save, '\n') == -1 && rd)
 	{
 		if ((rd = read(fd, buff, BUFFER_SIZE)) == -1)
 		{
@@ -71,7 +66,7 @@ int		get_next_line(int fd, char **line)
 		save = ft_strjoin(save, buff);
 	}
 	free(buff);
-	get_line(*line, save);
+	*line = get_line(save);
 	save = get_keep_save(save);
 	if (!rd)
 		return (0);
